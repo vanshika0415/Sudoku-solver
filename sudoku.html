@@ -3,17 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dynamic Sudoku</title>
+    <title>Sudoku Game</title>
     <link rel="stylesheet" href="sudoku.css">
 </head>
 <body>
-    <h1>Sudoku Board</h1>
+    <h1>Sudoku Game</h1>
+    <p>Errors: <span id="error-count">0</span></p>
     <div id="sudoku-container"></div>
-    <div>
-        <button onclick="solveSudoku()">Solve Sudoku</button>
-        <button onclick="resetBoard()">Reset Board</button>
-    </div>
-    <p id="message"></p>
+    <button onclick="generateSudoku()">Generate New Sudoku</button>
+    <button onclick="showSolution()">Show Solution</button> <!-- Show Solution Button -->
     <script src="sudoku.js"></script>
 </body>
 </html>

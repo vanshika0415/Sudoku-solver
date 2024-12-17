@@ -1,74 +1,20 @@
+/* General Styles */
 body {
+    font-family: Arial, sans-serif;
     text-align: center;
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f3f4f6;
-    color: #333;
-    margin: 0;
-    padding: 0;
-}
-
-h1 {
-    font-size: 2.5rem;
-    color: #444;
-    margin-top: 20px;
-    margin-bottom: 10px;
-}
-
-#sudoku-container {
-    display: grid;
-    grid-template-columns: repeat(9, 45px);
-    grid-template-rows: repeat(9, 45px);
-    gap: 2px;
-    margin: 20px auto;
-    width: fit-content;
-    border: 4px solid #555;
-    background-color: #fff;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
-    padding: 5px;
-}
-
-.cell {
-    text-align: center;
-    font-size: 1.4rem;
-    font-weight: 400;
-    border: 1px solid #ddd;
-    background-color: #f9f9f9;
-    color: #333;
-    border-radius: 5px;
-    transition: 0.2s ease;
-}
-
-.cell:focus {
-    border-color: #007bff;
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-    outline: none;
-    background-color: #eef6ff;
-}
-
-.readonly {
-    background-color: #e8e8e8;
-    font-weight: bold;
-    color: #444;
-    pointer-events: none;
-}
-
-.cell:hover {
-    background-color: #f1f1f1;
 }
 
 button {
     padding: 10px 20px;
-    margin: 10px;
     font-size: 1rem;
-    font-weight: bold;
     color: #fff;
     background-color: #007bff;
     border: none;
     border-radius: 5px;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: 0.3s;
+    margin-top: 10px;
+    margin-right: 10px;
 }
 
 button:hover {
@@ -79,9 +25,52 @@ button:active {
     transform: scale(0.98);
 }
 
-#message {
-    font-size: 1.2rem;
-    font-weight: bold;
-    margin-top: 10px;
-    color: #28a745;
+h1 {
+    margin-bottom: 20px;
+}
+
+/* Sudoku Grid Styles */
+#sudoku-container {
+    display: grid;
+    grid-template-columns: repeat(9, 40px);
+    grid-template-rows: repeat(9, 40px);
+    gap: 2px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+input.cell {
+    width: 40px;
+    height: 40px;
+    text-align: center;
+    font-size: 1.5rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+input.readonly {
+    background-color: #f0f0f0;
+}
+
+input.correct {
+    background-color: #28a745;
+    color: white;
+}
+
+input.wrong {
+    background-color: #dc3545;
+    color: white;
+}
+
+/* Styling for grid lines */
+input:nth-child(3n), input:nth-child(6n) {
+    border-right: 2px solid black;
+}
+
+input:nth-child(27), input:nth-child(54) {
+    border-bottom: 2px solid black;
+}
+
+input:nth-child(63), input:nth-child(72) {
+    border-bottom: 2px solid black;
 }
