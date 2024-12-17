@@ -1,95 +1,148 @@
-var numSelected = null;
-var tileSelected = null;
+let originalBoard = [];
 
-var errors = 0;
+window.onload = function () {
+    generateSudoku();
+};
 
-var board = [
-    "--74916-5",
-    "2---6-3-9",
-    "-----7-1-",
-    "-586----4",
-    "--3----9-",
-    "--62--187",
-    "9-4-7---2",
-    "67-83----",
-    "81--45---"
-]
+// Generate a solvable Sudoku puzzle
+function generateSudoku() {
+    let board = Array.from({ length: 9 }, () => Array(9).fill(0));
 
-var solution = [
-    "387491625",
-    "241568379",
-    "569327418",
-    "758619234",
-    "123784596",
-    "496253187",
-    "934176852",
-    "675832941",
-    "812945763"
-]
-
-window.onload = function() {
-    setGame();
+    fillBoard(board);
+    removeNumbers(board, 40); // Remove 40 numbers to create a puzzle
+    originalBoard = board.map(row => [...row]); // Save for reset
+    displayBoard(board);
 }
 
-function setGame() {
-    // Digits 1-9
-    for (let i = 1; i <= 9; i++) {
-        //<div id="1" class="number">1</div>
-        let number = document.createElement("div");
-        number.id = i
-        number.innerText = i;
-        number.addEventListener("click", selectNumber);
-        number.classList.add("number");
-        document.getElementById("digits").appendChild(number);
-    }
-
-    // Board 9x9
+// Backtracking algorithm to fill the board
+function fillBoard(board) {
+    let nums = [1, 2, 3, 4, 5, 6, 7, 8, 9];
     for (let r = 0; r < 9; r++) {
         for (let c = 0; c < 9; c++) {
-            let tile = document.createElement("div");
-            tile.id = r.toString() + "-" + c.toString();
-            if (board[r][c] != "-") {
-                tile.innerText = board[r][c];
-                tile.classList.add("tile-start");
+            if (board[r][c] === 0) {
+                nums = shuffle(nums);
+                for (let num of nums) {
+                    if (isValid(board, r, c, num)) {
+                        board[r][c] = num;
+                        if (fillBoard(board)) return true;
+                        board[r][c] = 0; // Backtrack
+                    }
+                }
+                return false;
             }
-            if (r == 2 || r == 5) {
-                tile.classList.add("horizontal-line");
-            }
-            if (c == 2 || c == 5) {
-                tile.classList.add("vertical-line");
-            }
-            tile.addEventListener("click", selectTile);
-            tile.classList.add("tile");
-            document.getElementById("board").append(tile);
+        }
+    }
+    return true;
+}
+
+// Shuffle an array
+function shuffle(arr) {
+    return arr.sort(() => Math.random() - 0.5);
+}
+
+// Remove random numbers to create a puzzle
+function removeNumbers(board, count) {
+    while (count > 0) {
+        let row = Math.floor(Math.random() * 9);
+        let col = Math.floor(Math.random() * 9);
+        if (board[row][col] !== 0) {
+            board[row][col] = 0;
+            count--;
         }
     }
 }
 
-function selectNumber(){
-    if (numSelected != null) {
-        numSelected.classList.remove("number-selected");
+// Display the Sudoku grid
+function displayBoard(board) {
+    const container = document.getElementById("sudoku-container");
+    container.innerHTML = ""; // Clear previous board
+
+    for (let r = 0; r < 9; r++) {
+        for (let c = 0; c < 9; c++) {
+            let cell = document.createElement("input");
+            cell.type = "text";
+            cell.maxLength = 1;
+            cell.classList.add("cell");
+            cell.id = `cell-${r}-${c}`;
+
+            if (board[r][c] !== 0) {
+                cell.value = board[r][c];
+                cell.readOnly = true;
+                cell.classList.add("readonly");
+            }
+
+            cell.oninput = () => validateInput(cell);
+            container.appendChild(cell);
+        }
     }
-    numSelected = this;
-    numSelected.classList.add("number-selected");
 }
 
-function selectTile() {
-    if (numSelected) {
-        if (this.innerText != "") {
-            return;
-        }
+// Validate input for single digits 1-9
+function validateInput(cell) {
+    const value = cell.value;
+    if (!/^[1-9]$/.test(value)) {
+        cell.value = "";
+    }
+}
 
-        // "0-0" "0-1" .. "3-1"
-        let coords = this.id.split("-"); //["0", "0"]
-        let r = parseInt(coords[0]);
-        let c = parseInt(coords[1]);
+// Solve the Sudoku board using backtracking
+function solveSudoku() {
+    let board = getBoard();
+    if (solve(board)) {
+        displayBoard(board);
+        document.getElementById("message").innerText = "Solved successfully!";
+    } else {
+        document.getElementById("message").innerText = "No solution exists.";
+    }
+}
 
-        if (solution[r][c] == numSelected.id) {
-            this.innerText = numSelected.id;
+// Get board data from the grid
+function getBoard() {
+    let board = [];
+    for (let r = 0; r < 9; r++) {
+        let row = [];
+        for (let c = 0; c < 9; c++) {
+            const cellValue = document.getElementById(`cell-${r}-${c}`).value;
+            row.push(cellValue === "" ? 0 : parseInt(cellValue));
         }
-        else {
-            errors += 1;
-            document.getElementById("errors").innerText = errors;
+        board.push(row);
+    }
+    return board;
+}
+
+// Solve function using backtracking
+function solve(board) {
+    for (let r = 0; r < 9; r++) {
+        for (let c = 0; c < 9; c++) {
+            if (board[r][c] === 0) {
+                for (let num = 1; num <= 9; num++) {
+                    if (isValid(board, r, c, num)) {
+                        board[r][c] = num;
+                        if (solve(board)) return true;
+                        board[r][c] = 0; // Backtrack
+                    }
+                }
+                return false;
+            }
         }
     }
+    return true;
+}
+
+// Check if placing num in board[r][c] is valid
+function isValid(board, row, col, num) {
+    for (let i = 0; i < 9; i++) {
+        if (board[row][i] === num || board[i][col] === num) return false;
+
+        const boxRow = 3 * Math.floor(row / 3) + Math.floor(i / 3);
+        const boxCol = 3 * Math.floor(col / 3) + (i % 3);
+        if (board[boxRow][boxCol] === num) return false;
+    }
+    return true;
+}
+
+// Reset board to original state
+function resetBoard() {
+    displayBoard(originalBoard);
+    document.getElementById("message").innerText = "";
 }
